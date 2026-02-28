@@ -17,7 +17,7 @@ $(document).ready(function () {
 
     menu.on("click", () => {
         if (isSideBarOpen) {
-            side_bar.css("left", "-280px");
+            side_bar.css("left", "-300px");
             isSideBarOpen = false;
         } else {
             side_bar.css("left", "0px");
@@ -27,7 +27,7 @@ $(document).ready(function () {
 
     container.on("click", () => {
         if (isSideBarOpen) {
-            side_bar.css("left", "-280px");
+            side_bar.css("left", "-300px");
             isSideBarOpen = false;
         }
     });
