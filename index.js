@@ -71,7 +71,7 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         userCount--;
-        socket.broadcast.emit("left", users[socket.id]);
+        socket.broadcast.emit("left", users[socket.id]!=null?users[socket.id]:'Previous stranger');
         delete users[socket.id];
     });
 
