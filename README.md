@@ -1,8 +1,3 @@
-# 💬 VChat – Real-Time Group Chat Application
-
-VChat is a professional real-time web chat application built using Node.js, Express, and Socket.io.  
-It enables multiple users to join a shared chat room and communicate instantly.
-
 ---
 # 💬 VChat – Real-Time Group Chat Application
 
@@ -23,7 +18,7 @@ It allows multiple users to connect and chat instantly in a shared environment.
 ![VChat Preview](image.png)
 ## 🖼️ Application Preview in (mobile phone)
 
-<p align="center" >
+<p align="center" style='display:flex;gap:10px;' >
   <img src="image2.png" width="48%" />
   <img src="image3.png" width="48%" />
 </p>
