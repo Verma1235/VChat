@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VChat -Real time chat application </title>
+    <script src="js/clint.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <header>
+        <div class="menu" id="menu">
+            <div style="width: 100%;height: auto;">
+                <div class="menu_strip"></div>
+                <div class="menu_strip"></div>
+                <div class="menu_strip"></div>
+            </div>
+
+        </div>
+        <div class="profile">
+            <img src="vlogo.png" height="99%" width="99%" style="border-radius: 0%;">
+
+        </div>
+
+
+    </header>
+
+
+    <main>
+        <!-- <nav>
+        <img src="vlogo.png" alt="Verma chat" class="logo">
+    </nav><br> -->
+        <div class="user_joined_list">
+            <div class="menu community_profile"> <img src="vlogonew.png" height="99%" width="99%"
+                    style="border-radius: 50%;"></div>
+            <div><span id="group_name">Verma Plateform</span><span id="seen_data"></span></div>
+
+        </div>
+        <div class="chat_container">
+            <!-- <center><small class="plateform">Welcome to Verma Chat Community </small></center> -->
+            <!-- <div class="message right"><b class="user_name">Dinesh:</b> <small>How are
+                    youghfdsgfgdsgydgyucdgfghjgdfgdfygdfyugdfyuhfgvbg</small></div>
+            <div class="message left"><b class="user_name"><span>Alka:</span><span id="time_show">4:20 pm</span></b> <small>I
+                    am fineyoughfdsgfgdsgydgyucdgfghjgdfgdfygdfyugdfyuhfgvbg</small></div>
+            <div class="message_extra "> Dinesh joined the chat</div>
+            <h1>Current Time</h1>
+            <p>The current time is: <span id="current-time"></span></p>
+
+
+ -->
+ <!-- <div class="VP_UPDATE"> Dinesh joined the chat</div>
+ -->
+
+        </div>
+
+
+        <div class="send">
+            <form id="send_cont">
+                <input type="text" name="message" id="message" oninput="typing()" class="message_input"
+                    placeholder="Type text..">
+                <button type="submit" class="btn_send" id="send_btn">send</button>
+
+            </form>
+        </div>
+
+
+    </main>
+
+
+    <div id="side_bar_cont">
+<h3 style="padding: 5px;color:rgb(255, 217, 0)">Developer: Dinesh kumar verma <a href="https://wa.me/qr/PQLVUM3GNTR7F1" target="_blank">contact</a></h3>
+
+
+
+    </div>
+</body>
+<script defer src="/socket.io/socket.io.js"></script>
+
+<script>
+    // side bar controler
+    // alert($.now())
+    var side_bar = $("#side_bar_cont");
+    var menu = $("#menu");
+    var a = 1;
+    menu.on("click", () => {
+        if (a == 0) {
+            side_bar.css({ "transition": "0.5s", "left": "-250px" });
+
+            a = 1;
+        } else {
+            side_bar.css({ "left": "0px", "transition": "0.5s" });
+            a = 0;
+        }
+    });
+
+    $(".chat_container").on("click", () => {
+        if (a == 1) {
+            side_bar.css({ "left": "-250px", "transition": "0.5s" });
+            a = 0;
+        }
+
+
+    });
+
+
+</script>
+<script>
+    var socket;
+
+
+
+    $(document).ready(function () {
+        var name = prompt("Enter your name !!");
+        // var password=prompt("Enter Password of Verma Plateform !!");
+    //     if(password=="")
+    // {
+        socket = io();
+        // alert("Connection Establish succesfully !!");
+    // }
+    // else{
+    //     alert("password Wrong !! unsuccesfull to establish connection with Verma chat Plateform  !! ");
+    // }
+        
+      
+        if (name == null || name == "" || name == undefined) {
+            alert(name);
+            name = "new Guest";
+        }
+
+       
+
+
+        socket.emit("new_user_joined",{ name:name,password:"185"});
+
+
+        var container = $(".chat_container");
+        var input_message = $("#message");
+        var send_btn = $("#send_btn");
+        var audio = new Audio('ting.mp3');
+
+
+
+
+
+
+
+
+
+
+
+
+
+        const appned_user_joined = (message) => {
+            var messageElement = "  <div class='message_extra '> " + message + "</div>";
+
+            container.append(messageElement);
+            container.scrollBottom(container.height() * 1000000);
+
+        }
+        const append_message = (message, position, name, hours, minutes, pm_or_am) => {
+            var messageElement = " <div class='message " + position + "'><b class='user_name'><span>" + name + "</span><span class='time_show'>" + hours + ":" + minutes + " " + pm_or_am + "</span><br></b> <small>" + message + "</small></div>";
+            //    alert(messageElement);
+            container.append(messageElement);
+            if (position == "left") {
+                audio.play();
+            }
+            container.scrollTop(container.height() * 1000000);
+
+
+        }
+
+        send_btn.on("click", (e) => {
+            e.preventDefault();
+            if (input_message.val() != "" && input_message.val() != " " && input_message.val() != "  " && input_message.val() != "   " && input_message.val() != "    ") {
+                // alert(input_message.val())
+                var now = new Date();
+                var hours = ('0' + now.getHours()).slice(-2);
+                var minutes = ('0' + now.getMinutes()).slice(-2);
+                var seconds = ('0' + now.getSeconds()).slice(-2);
+                var pm_or_am = "AM";
+                if (hours >= 12) {
+                    hours = hours - 12;
+                    if(hours==0 || hours=="00"){
+                        hours=12;
+                    }
+                    pm_or_am = "PM";
+
+                }
+                var mess = input_message.val();
+
+                socket.emit("send",{ mess:mess, hours:hours, minutes:minutes,pm_or_am:pm_or_am});
+
+                append_message(`${input_message.val()}`, `right`, `you`, hours, minutes, pm_or_am);
+
+                input_message.val("");
+            }
+        });
+function ofline_user(){
+    $("#seen_data").html("ofline");
+}
+
+
+        socket.on("user_joined", (name) => {
+            appned_user_joined(`!! ${name} join  the chat !!`);
+        });
+
+        socket.on("stranger", (data) => {
+            appned_user_joined(`!! ${data.name} trying to join this chat  !! Entered passsword by Stranger: ${data.password} !!`);
+        });
+
+
+
+        socket.on("left", (name) => {
+            setTimeout(ofline_user,2000);
+            appned_user_joined(`!! ${name} left  the chat !!`);
+         
+        });
+        socket.on("receive", data => {
+            append_message(`${data.message}`, `${data.position}`, `${data.name}`,`${data.hours}`,`${data.minutes}`,`${data.pm_or_am}`);
+
+        })
+        function clear_data() {
+            $("#seen_data").html("online");
+        }
+        socket.on("type", (name) => {
+
+            $("#seen_data").html(`${name}:typing...`);
+        
+            setTimeout(clear_data, 3000);
+
+        });
+        socket.on("owner",(name)=>{
+            alert(`Welcome mr. ${name} !! Owner of verma Plateform !!`);
+        });
+
+
+
+
+
+
+
+    });
+    function typing() {
+        socket.emit("user_typeing");
+    }
+
+
+    // $(document).ready(function () {
+    //     // Function to update the current time
+    //     function updateCurrentTime() {
+    //         var now = new Date();
+    //         var hours = ('0' + now.getHours()).slice(-2);
+    //         var minutes = ('0' + now.getMinutes()).slice(-2);
+    //         var seconds = ('0' + now.getSeconds()).slice(-2);
+    //         var pm_or_am = "AM";
+    //         if (hours > 12) {
+    //             hours = hours - 12;
+    //             pm_or_am = "PM";
+
+    //         }
+    //         var formattedTime = hours + ':' + minutes + ':' + seconds + ' ' + pm_or_am;
+    //         $('#current-time').text(formattedTime);
+    //     }
+
+    //     // Initial call to update time
+    //     updateCurrentTime();
+
+    //     // Update time every second
+    //     setInterval(updateCurrentTime, 1000);
+    // });
+</script>
+
+
+</html>

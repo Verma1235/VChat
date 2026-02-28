@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VChat - Professional Real-Time Chat</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script defer src="/socket.io/socket.io.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Keeping sidebar logic visibility toggles standard since JS likely manipulates 'left' or 'transform' */
+        #side_bar_cont {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+        }
+
+        .chat_container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat_container::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="h-full flex flex-col overflow-hidden text-slate-900">
+
+    <header
+        class="app-header h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center sticky top-0 z-30 px-4 md:px-8">
+        <div class="header-content flex items-center justify-between w-full max-w-7xl mx-auto">
+
+            <div class="flex items-center gap-4">
+                <div class="menu cursor-pointer group p-2 hover:bg-slate-100 rounded-lg transition-colors" id="menu">
+                    <div class="hamburger space-y-1.5">
+                        <div class="menu_strip w-6 h-0.5 bg-slate-600 group-hover:bg-blue-600 transition-colors"></div>
+                        <div class="menu_strip w-6 h-0.5 bg-slate-600 group-hover:bg-blue-600 transition-colors"></div>
+                        <div class="menu_strip w-4 h-0.5 bg-slate-600 group-hover:bg-blue-600 transition-colors"></div>
+                    </div>
+                </div>
+
+                <div class="user_joined_list flex items-center gap-3">
+                    <div
+                        class="community_profile w-10 h-10 rounded-full overflow-hidden ring-2 ring-blue-500 ring-offset-2 flex-shrink-0">
+                        <img src="vlogonew.png" alt="Group Logo" class="w-full h-full object-cover">
+                    </div>
+                    <div class="group-text flex flex-col">
+                        <span id="group_name" class="font-bold text-slate-800 leading-none">Verma Platform</span>
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <span class="relative flex h-2 w-2">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
+                            <span id="seen_data"
+                                class="text-[10px] uppercase tracking-wider font-bold text-green-600">online</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="profile w-10 h-10 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm hover:scale-105 transition-transform cursor-pointer">
+                <img src="vlogo.png" alt="User Logo" class="w-full h-full object-cover">
+            </div>
+        </div>
+    </header>
+
+    <main
+        class="chat-wrapper flex-1 flex flex-col w-full max-w-5xl mx-auto bg-white shadow-2xl md:my-4 md:rounded-2xl overflow-hidden relative border border-slate-200">
+
+        <div class="chat_container flex-1 p-4 md:p-6 overflow-y-auto bg-slate-50/50 flex flex-col gap-4"
+            id="chat_container">
+            <div
+                class="message_extra self-center text-[11px] font-medium text-slate-400 bg-white border border-slate-200 px-4 py-1.5 rounded-full shadow-sm">
+                <i class="bi bi-shield-lock-fill mr-1"></i> Secure end-to-end encrypted chat
+            </div>
+
+        </div>
+
+        <div class="send p-4 bg-white border-t border-slate-100">
+            <form id="send_cont" class="flex items-center gap-3 max-w-4xl mx-auto">
+                <div class="relative flex-1">
+                    <input type="text" name="message" id="message" oninput="typing()"
+                        class="message_input w-full bg-slate-100 border-none rounded-2xl py-3.5 px-6 text-sm focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all outline-none"
+                        placeholder="Write something friendly..." autocomplete="off">
+                </div>
+                <button type="submit"
+                    class="btn_send w-12 h-12 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-95"
+                    id="send_btn">
+                    <i class="bi bi-send-fill text-lg"></i>
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <aside id="side_bar_cont"
+        class="fixed top-0 -left-[300px] w-[300px] h-full bg-slate-900 text-white shadow-2xl overflow-hidden">
+        <div class="sidebar-inner p-8 flex flex-col h-full">
+            <div class="flex-1">
+                <div class="dev-card bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
+                    <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-4">Developer Info</h3>
+                    <p class="text-xl font-semibold mb-1 text-white">Dinesh Kumar Verma</p>
+                    <p class="text-slate-400 text-sm mb-6">Full Stack Developer & Architect</p>
+
+                    <a href="https://wa.me/qr/6IIZKFE7Z2OTA1" target="_blank"
+                        class="contact-link flex items-center justify-center gap-2 w-full py-3 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded-xl border border-green-500/30 transition-all font-medium">
+                        <i class="bi bi-whatsapp"></i> Contact Developer
+                    </a>
+                </div>
+            </div>
+
+            <div class="text-[10px] text-slate-500 text-center uppercase tracking-tighter">
+                VChat v2.0 • 2024 Built with ❤️
+            </div>
+        </div>
+    </aside>
+
+    <style>
+        /* These styles target the classes your client.js adds dynamically */
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 1.25rem;
+            font-size: 0.9375rem;
+            line-height: 1.5;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .left {
+            align-self: flex-start;
+            background: #ffffff;
+            color: #1e293b;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .right {
+            align-self: flex-end;
+            background: #2563eb;
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .user_name {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            opacity: 0.8;
+        }
+
+        .time_show {
+            font-size: 0.65rem;
+            margin-left: 8px;
+            opacity: 0.7;
+        }
+    </style>
+
+    <script src="js/client.js"></script>
+</body>
+
+</html>
