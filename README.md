@@ -23,10 +23,10 @@ It allows multiple users to connect and chat instantly in a shared environment.
 ![VChat Preview](image.png)
 ## 🖼️ Application Preview in (mobile phone)
 
-![VChat Preview](image2.png)
-![VChat Preview](image3.png)
-
-> If the image does not load on GitHub, replace this link with a screenshot uploaded inside your repository (recommended).
+<p align="center" >
+  <img src="image2.png" width="48%" />
+  <img src="image3.png" width="48%" />
+</p>
 
 ---
 
