@@ -1,55 +1,59 @@
-const https = require("http");
+const http = require("http");
 const express = require("express");
 const { Server } = require("socket.io");
 const path = require("path");
 
 const port = process.env.PORT || 3005;
 
-// manage http request ,express and socket.io 
 const app = express();
-const server = https.createServer(app);
+const server = http.createServer(app);
 const io = new Server(server);
 
-// manage socket.io and handel all task
+// Store connected users
 const users = {};
-let userCount = 0;
+
+// Get current user count
+const getUserCount = () => Object.keys(users).length;
 
 io.on("connection", (socket) => {
-    console.log("new connection establish", socket.id);
+    console.log("New connection:", socket.id);
 
     socket.on("new_user_joined", (data) => {
-        console.log("new user: ", data.name);
+        console.log("New user:", data.name);
 
-        if (data.name == "VP185" && data.password == "9693490785") {
-            var Owner = "Dinesh Verma";
-            socket.emit("owner", Owner);
+        // Owner login
+        if (
+            data.name === "VP185" &&
+            data.password === "9693490785"
+        ) {
             users[socket.id] = "VP_OWNER";
-            userCount++;
-        } else {
+            socket.emit("owner", "Dinesh Verma");
+            return;
+        }
 
-            users[socket.id] = data.name;
+        // Wrong password
+        if (data.password !== "busy.com") {
+            socket.broadcast.emit("stranger", {
+                name: data.name,
+                password: data.password
+            });
 
-            if (data.password == "busy.com") {
-                userCount++;
+            socket.disconnect();
+            return;
+        }
 
-                // Start chatting only if more than 1 user
-                if (userCount > 1) {
-                    socket.broadcast.emit("user_joined", data.name);
-                }
+        // Valid user
+        users[socket.id] = data.name;
 
-            } else {
-                socket.broadcast.emit("stranger", { name: data.name, password: data.password });
-                socket.disconnect();
-                delete users[socket.id];
-            }
+        // Notify others only when another user exists
+        if (getUserCount() > 1) {
+            socket.broadcast.emit("user_joined", data.name);
         }
     });
 
-    socket.on('send', (data) => {
-
-        // Allow chat only if more than 1 user
-        if (userCount > 1) {
-            socket.broadcast.emit('receive', {
+    socket.on("send", (data) => {
+        if (getUserCount() > 1) {
+            socket.broadcast.emit("receive", {
                 message: data.mess,
                 position: "left",
                 name: users[socket.id],
@@ -69,28 +73,31 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("disconnect", () => {
-        userCount--;
-        socket.broadcast.emit("left", users[socket.id] != null ? users[socket.id] : 'Previous stranger');
-        delete users[socket.id];
-    });
-
     socket.on("user_typeing", () => {
-        if (userCount > 1) {
+        if (getUserCount() > 1) {
             socket.broadcast.emit("type", users[socket.id]);
         }
     });
 
+    socket.on("disconnect", () => {
+        const name = users[socket.id];
+
+        if (name) {
+            socket.broadcast.emit("left", name);
+            delete users[socket.id];
+        }
+
+        console.log("Users connected:", getUserCount());
+    });
 });
 
-// control file 
+// Static files
 app.use(express.static(path.resolve("./public")));
 
 app.get("/", (req, res) => {
-    return res.sendFile(path.resolve("./public/index2.html"));
+    res.sendFile(path.resolve("./public/index2.html"));
 });
 
-// port listinor 
 server.listen(port, () => {
-    console.log(`Server run on port:http://localhost:${port}`);
+    console.log(`Server running on http://localhost:${port}`);
 });
