@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
 
             users[socket.id] = data.name;
 
-            if (data.password == "185") {
+            if (data.password == "busy.com") {
                 userCount++;
 
                 // Start chatting only if more than 1 user

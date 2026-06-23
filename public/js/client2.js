@@ -45,14 +45,41 @@ $(document).ready(function () {
         // function, symbol, bigint, etc.
         return false;
     };
+
+    // let iBtn=document.querySelector("#info-btn");
+
+    // re create crediantial
+    function reCreateCrediantial() {
+        // alert('working');
+        let name = prompt("Enter your name");
+        localStorage.setItem("userName", name);
+        let pass = prompt("Enter Security password");
+        localStorage.setItem("userPass", pass);
+        window.location.reload();
+    }
+
+    $("#info-btn").on('click', () => {
+        reCreateCrediantial();
+    })
+
     let name = "";
+    let pass = "";
     let userName = localStorage.getItem('userName') || null;
+    let userPass = localStorage.getItem('userPass') || null;
+
     if (isEmpty(userName)) {
         name = prompt("Enter your name");
         localStorage.setItem("userName", name);
 
     } else {
         name = userName;
+    }
+
+    if (isEmpty(userPass)) {
+        pass = prompt("Enter Security password");
+        localStorage.setItem("userPass", pass);
+    } else {
+        pass = userPass;
     }
 
 
@@ -64,7 +91,7 @@ $(document).ready(function () {
 
     socket.emit("new_user_joined", {
         name: name,
-        password: "185"
+        password: pass || "185"
     });
 
     const container = $("#messages-area");
