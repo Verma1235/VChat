@@ -3,7 +3,7 @@ const express = require("express");
 const { Server } = require("socket.io");
 const path = require("path");
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3005;
 
 // manage http request ,express and socket.io 
 const app = express();
@@ -71,7 +71,7 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         userCount--;
-        socket.broadcast.emit("left", users[socket.id]!=null?users[socket.id]:'Previous stranger');
+        socket.broadcast.emit("left", users[socket.id] != null ? users[socket.id] : 'Previous stranger');
         delete users[socket.id];
     });
 
@@ -87,7 +87,7 @@ io.on("connection", (socket) => {
 app.use(express.static(path.resolve("./public")));
 
 app.get("/", (req, res) => {
-    return res.sendFile(path.resolve("./public/index.html"));
+    return res.sendFile(path.resolve("./public/index2.html"));
 });
 
 // port listinor 
