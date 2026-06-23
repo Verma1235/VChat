@@ -49,17 +49,24 @@ $(document).ready(function () {
     // let iBtn=document.querySelector("#info-btn");
 
     // re create crediantial
-    function reCreateCrediantial() {
-        // alert('working');
+    // Re-create credential
+    function reCreateCredential() {
         let name = prompt("Enter your name");
-        localStorage.setItem("userName", name);
         let pass = prompt("Enter Security password");
-        localStorage.setItem("userPass", pass);
+
+        if (name && !isEmpty(name.trim())) {
+            localStorage.setItem("userName", name.trim());
+        }
+
+        if (pass && !isEmpty(pass.trim())) {
+            localStorage.setItem("userPass", pass.trim());
+        }
+
         window.location.reload();
     }
 
     $("#info-btn").on('click', () => {
-        reCreateCrediantial();
+        reCreateCredential();
     })
 
     let name = "";
