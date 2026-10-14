@@ -23,7 +23,7 @@ io.on("connection", (socket) => {
 
         // Owner login
         if (
-            data.name === "VP185" &&
+            data.name === "VP18" &&
             data.password === "9693490785"
         ) {
             users[socket.id] = "VP_OWNER";
